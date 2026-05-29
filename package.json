@@ -1,0 +1,23 @@
+{
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "aws-cdk": "^2.1125.0",
+    "typescript": "^6.0.3"
+  },
+  "name": "discordtwitchnotif",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "cdk deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "aws-cdk-lib": "^2.257.0",
+    "constructs": "^10.6.0"
+  }
+}
