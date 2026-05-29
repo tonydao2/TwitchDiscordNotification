@@ -6,10 +6,11 @@ class DiscordTwitchNotifStack extends cdk.Stack {
     super(scope, id, props);
 
     // AWS Secrets Manager
-    const TwitchSecrets = 'secrets-manager-twitch';
-    const DiscordSecrets = 'secrets-manager-discord-webhook';
+    const DiscordTwitchSecrets = 'secrets-manager-twitch-discord';
 
-    // Lambda 
+    const tag = Math.random() * 1000000;
+
+    // Lambda
     const lambda = new cdk.aws_lambda.DockerImageFunction(
       this,
       'TwitchDiscordLambda',
@@ -18,15 +19,18 @@ class DiscordTwitchNotifStack extends cdk.Stack {
         code: cdk.aws_lambda.DockerImageCode.fromImageAsset('./src', {
           file: 'Dockerfile',
           platform: cdk.aws_ecr_assets.Platform.LINUX_AMD64,
+          buildArgs: {
+            FORCE_REBUILD: tag.toString(),
+          },
+          assetName: 'twitch-discord-notif-ECR',
         }),
         memorySize: 256,
         timeout: cdk.Duration.seconds(30),
         environment: {
-          TWITCH_SECRETS: TwitchSecrets,
-          DISCORD_SECRETS: DiscordSecrets,
+          TWITCH_SECRETS: DiscordTwitchSecrets,
         },
         logFormat: cdk.aws_lambda.LogFormat.JSON,
-        applicationLogLevelV2: cdk.aws_lambda.ApplicationLogLevel.ERROR,
+        applicationLogLevelV2: cdk.aws_lambda.ApplicationLogLevel.DEBUG,
         systemLogLevelV2: cdk.aws_lambda.SystemLogLevel.INFO,
       },
     );
@@ -43,14 +47,25 @@ class DiscordTwitchNotifStack extends cdk.Stack {
     const secretsManager = new cdk.aws_iam.PolicyStatement({
       actions: ['secretsmanager:GetSecretValue'],
       resources: [
-        `arn:aws:secretsmanager:${this.region}:${this.account}:secret:${TwitchSecrets}*`,
-        `arn:aws:secretsmanager:${this.region}:${this.account}:secret:${DiscordSecrets}*`,
+        `arn:aws:secretsmanager:${this.region}:${this.account}:secret:${DiscordTwitchSecrets}*`,
       ],
     });
 
     lambda.addToRolePolicy(secretsManager);
 
     // API Gateway to trigger Lambda
+    const api = new cdk.aws_apigatewayv2.HttpApi(this, 'TwitchDiscordApi', {
+      apiName: 'TwitchDiscordNotificationApi',
+    });
+
+    api.addRoutes({
+      path: '/notify',
+      methods: [cdk.aws_apigatewayv2.HttpMethod.POST],
+      integration: new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+        'LambdaIntegration',
+        lambda,
+      ),
+    });
 
     // SNS to Slack/Email myself if failed
   }
