@@ -7,6 +7,7 @@ class DiscordTwitchNotifStack extends cdk.Stack {
 
     // AWS Secrets Manager
     const DiscordTwitchSecrets = 'secrets-manager-twitch-discord';
+    const TwitchWebhookSecrets = 'twitch-webhook-secrets';
 
     const tag = Math.random() * 1000000;
 
@@ -28,6 +29,7 @@ class DiscordTwitchNotifStack extends cdk.Stack {
         timeout: cdk.Duration.seconds(30),
         environment: {
           TWITCH_SECRETS: DiscordTwitchSecrets,
+          TWITCH_WEBHOOK_SECRETS: TwitchWebhookSecrets,
         },
         logFormat: cdk.aws_lambda.LogFormat.JSON,
         applicationLogLevelV2: cdk.aws_lambda.ApplicationLogLevel.DEBUG,
@@ -48,6 +50,7 @@ class DiscordTwitchNotifStack extends cdk.Stack {
       actions: ['secretsmanager:GetSecretValue'],
       resources: [
         `arn:aws:secretsmanager:${this.region}:${this.account}:secret:${DiscordTwitchSecrets}*`,
+        `arn:aws:secretsmanager:${this.region}:${this.account}:secret:${TwitchWebhookSecrets}*`,
       ],
     });
 
