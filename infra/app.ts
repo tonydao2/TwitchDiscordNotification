@@ -70,6 +70,9 @@ class DiscordTwitchNotifStack extends cdk.Stack {
       ),
     });
 
+    // DynamoDB table for lookup of which discord channels to post to based on streamer
+    const webhookUrlTable = new cdk.aws_dynamodb();
+
     // SNS to Slack/Email myself if failed
   }
 }
