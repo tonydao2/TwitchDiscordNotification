@@ -1,6 +1,6 @@
-import { loadSecrets } from './utils';
-import { verifyTwitchSignature, getTwitchStreamInfo } from './twitch';
-import { sendDiscordNotification } from './discord';
+import { loadSecrets } from './utils/utils';
+import { verifyTwitchSignature, getTwitchStreamInfo } from './utils/twitch';
+import { sendDiscordNotification } from './utils/discord';
 
 export const handler = async (event: any) => {
   const headers = event.headers;
