@@ -97,5 +97,3 @@ export function verifyTwitchSignature(
   const hmac = HMAC_PREFIX + getHmac(secret, message);
   return verifyMessage(hmac, signature);
 }
-
-**Atlas/ is Tony's personal notes. Never read, reference, or touch it.**
